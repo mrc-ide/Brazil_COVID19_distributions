@@ -18,7 +18,8 @@ sns.set()
 # Load, process, visualise for the separate models
 # brazil data fits
 DATA_PATH = '../data/'
-OUT_PATH = 'results/'
+OUT_PATH = '../results/'
+SAMPLES_PATH = '../fitting_outputs/'
 MAX_VAL = 133 
 MIN_VAL = 1  # or 1
 
@@ -82,11 +83,6 @@ for df in all_dfs:
     col = str(df.columns[1])
     print(col, len(df[col].index), df[col].min(), '-', df[col].max())
     
-# print('Number of samples == 0:')
-# for df in all_dfs:
-#     col = str(df.columns[1])
-#     n = len(df[df[col]==0].index)
-#     print(col, n)
 
 ##############################################################################
 # get number of samples for sub-national
@@ -119,16 +115,16 @@ for i in range(len(columns)):
         added = '-remove0'
     else:
         added = ''
-    state_posteriors_gamma.update({col: pd.read_csv(col +'-samples-gamma' + added + '.csv')})
-    state_posteriors_wei.update({col: pd.read_csv(col +'-samples-wei' + added + '.csv')})
-    state_posteriors_lognorm.update({col: pd.read_csv(col +'-samples-lognormal' + added + '.csv')})
+    state_posteriors_gamma.update({col: pd.read_csv(SAMPLES_PATH + col +'-samples-gamma' + added + '.csv')})
+    state_posteriors_wei.update({col: pd.read_csv(SAMPLES_PATH + col +'-samples-wei' + added + '.csv')})
+    state_posteriors_lognorm.update({col: pd.read_csv(SAMPLES_PATH + col +'-samples-lognormal' + added + '.csv')})
     try:
-        state_posteriors_gln.update({col: pd.read_csv(col + '-samples-gln' + added + '.csv')})
+        state_posteriors_gln.update({col: pd.read_csv(SAMPLES_PATH + col + '-samples-gln' + added + '.csv')})
     except:
         print(col, 'did not find samples for gln')
         state_posteriors_gln.update({col: state_posteriors_gln[columns[0]] * np.nan})
     try:
-        state_posteriors_gg.update({col: pd.read_csv(col + '-samples-gg' + added + '.csv').drop(columns = ['draw', 'accept_stat__', 'divergent__'])})
+        state_posteriors_gg.update({col: pd.read_csv(SAMPLES_PATH + col + '-samples-gg' + added + '.csv').drop(columns = ['draw', 'accept_stat__', 'divergent__'])})
     except:
         print(col, 'did not find samples for gg')
         state_posteriors_gg.update({col: state_posteriors_gg[columns[0]] * np.nan})

@@ -16,7 +16,7 @@ import time
 sns.set()
 
 DATA_PATH = '../../data/'
-OUT_PATH = '../'  # CHANGE BEFORE RUNNING THE JOB!!!!!
+OUT_PATH = '../fitting_outputs/'
 
 CHOSEN_COLUMN = 6
 SEED = 4321

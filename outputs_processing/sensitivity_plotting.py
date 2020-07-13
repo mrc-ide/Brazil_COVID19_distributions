@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set()
 
-PATH = 'results/MeanPosteriors'
+PATH = '../results/MeanPosteriors'
 
 cols_0 = ['onset-to-hospital-admission', 'onset-to-ICU-admission', 'Hospital-Admission-to-death']
 cols_censor = ['ICU-stay', 'onset-to-death', 'Hospital-Admission-to-death']
@@ -50,7 +50,7 @@ plt.xlabel('mean time (days)')
 plt.ylabel('')
 plt.xticks(np.arange(7, 16.5, 1.0))
 
-plt.savefig('results/' + 'sensitivityPlot.pdf', format='pdf', bbox_inches='tight')
+plt.savefig('../results/' + 'sensitivityPlot.pdf', format='pdf', bbox_inches='tight')
 
 
 # 90th Percentile
@@ -74,7 +74,7 @@ sensGroupped['quantile'] = 'mean'
 sensGroupped.rename(columns = {'mean': 'value'}, inplace=True)
 
 all_sensitivity_outputs = pd.concat([quantiles, sensGroupped])
-all_sensitivity_outputs.to_csv('results/' + 'sensitivityOutputs.csv', index=False)
+all_sensitivity_outputs.to_csv('../results/' + 'sensitivityOutputs.csv', index=False)
 
 
 

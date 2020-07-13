@@ -16,7 +16,6 @@ import time
 sns.set()
 
 DATA_PATH = '../data/'
-OUT_PATH = ''  # CHANGE BEFORE RUNNING THE JOB!!!!!
 
 SEED = 4321
 ITER = 2000
@@ -125,4 +124,4 @@ for col in columns:
     means = alphas / betas
     all_means[col] = means
 
-all_means.to_csv('results/MeansPosteriors/' + 'BrazilCensored.csv', index=False)
+all_means.to_csv('../results/MeansPosteriors/' + 'BrazilCensored.csv', index=False)

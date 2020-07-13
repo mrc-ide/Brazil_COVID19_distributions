@@ -18,7 +18,7 @@ map <- c('AC'='North', 'AM'='North', 'AP'='North', 'PA'='North', 'RO'='North', '
          'PR'='South', 'RS'='South', 'SC'='South')
 
 
-path <- 'C:/Users/iwona/Desktop/brazil/separate_models/results/MeansPosteriors/'
+path <- '../results/MeansPosteriors/'
 
 ICUstay <- read.csv(file = paste(path, columns[1], '.csv', sep = ''))
 AdminDeath <- read.csv(file = paste(path, columns[2], '.csv', sep = ''))

@@ -16,8 +16,7 @@ import time
 sns.set()
 
 DATA_PATH = '../data/'
-OUT_PATH = ''  # CHANGE BEFORE RUNNING THE JOB!!!!!
-
+OUT_PATH = '../fitting_outputs/'
 SEED = 4321
 ITER = 2000
 CHAINS = 4
