@@ -419,11 +419,18 @@ def stats_lognormal(df, dict_out=True):
 
 def inf_sum(r, mu, sig, g):
     result = 0
-    for j in range(1,150): # 100 should be enough to get this infinite sum but test it; gamma(170) = inf
+    tmp = 0
+    for j in range(1,151): # 100 should be enough to get this infinite sum but test it; gamma(170) = inf
         tmp = (r * sig)**j
         tmp = tmp * (1 + (-1)**j) * 2**(j/g)
         tmp = tmp * (scipy.special.gamma((j+1)/g) / scipy.special.gamma(j+1))
         result += tmp
+    # this sometimes diverges, so check the last tmp and see if it was small enough
+    if isinstance(tmp, float):
+        if tmp >=  0.0000001:
+            return np.nan
+    if tmp.any() >= 0.0000001:
+        result[tmp > 0.0000001] = np.nan
     return result
         
 def gln_mean_var_help(mu, sig, g):
@@ -447,10 +454,20 @@ def stats_gln(df, dict_out=True):
     mean, var = gln_mean_var_help(mu, sigma, g)
     if not dict_out:
         return mean, var
+    mean = mean[~np.isnan(mean)]
+    var = var[~np.isnan(var)]
+    if mean.size < 1000:        
+        return {'mean': np.nan, 'mean_CI95': np.nan,
+            'var': np.nan, 'var_CI95': np.nan}
+    if var.size < 1000:
+        mean_CI95 = tuple(np.round(np.quantile(mean,[.025,.975]),r))
+        return {'mean': round(mean.mean(),r), 'mean_CI95': mean_CI95, 
+                'var': np.nan, 'var_CI95': np.nan}
     mean_CI95 = tuple(np.round(np.quantile(mean,[.025,.975]),r))
     var_CI95 = tuple(np.round(np.quantile(var,[.025,.975]),r))
     return {'mean': round(mean.mean(),r), 'mean_CI95': mean_CI95,
             'var': round(var.mean(),r), 'var_CI95': var_CI95}
+
 
 def stats_gg(df, dict_out=True):
     df = df.copy()
@@ -551,9 +568,26 @@ results.to_csv(OUT_PATH + 'results_full_table.csv', index = False)
 ##############################################################################
 # get the onset to death parameters for the Rt estimation model
 
+
+def glue_two_cols(df, col1, col2):
+    vcol1 = df[col1].values
+    vcol2 = df[col2].values
+    glued_str = []
+    for i in range(len(vcol1)):
+        glued_str.append(str(vcol1[i]) + ' ' + str(vcol2[i]))
+    df[col1] = glued_str
+    df.drop(columns=col2, inplace=True)
+    return df
+    
 oDeathParams = results[results['model'] == 'Gamma']
 oDeathParams = oDeathParams[oDeathParams['dataset'] == 'onset-to-death']
 oDeathParams.to_csv(OUT_PATH + 'OnsetDeathParams.csv', index=False)
+oDeathParams.drop(columns = ['model', 'dataset', 'param3', 'param3_CI95'], inplace = True)
+oDeathParams = glue_two_cols(oDeathParams, 'mean', 'mean_CI95')
+oDeathParams = glue_two_cols(oDeathParams, 'var', 'var_CI95')
+oDeathParams = glue_two_cols(oDeathParams, 'param1', 'param1_CI95')
+oDeathParams = glue_two_cols(oDeathParams, 'param2', 'param2_CI95')
+oDeathParams.to_csv(OUT_PATH + 'OnsetDeathParamsStatesForManuscript.csv', index=False)
 
 ##############################################################################
 # create a table for the manuscript
