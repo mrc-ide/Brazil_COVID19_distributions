@@ -1,6 +1,9 @@
-# Brazil_COVID19_distributions
+# Brazil_COVID19_distributions 
 
-https://github.com/mrc-ide/Brazil_COVID19_distributions
+
+
+
+https://github.com/mrc-ide/Brazil_COVID19_distributions [![DOI](https://zenodo.org/badge/279160599.svg)](https://zenodo.org/badge/latestdoi/279160599)
 
 ## Abstract:
 
