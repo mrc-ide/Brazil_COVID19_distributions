@@ -87,7 +87,10 @@ for df in all_dfs:
 ##############################################################################
 # get number of samples for sub-national
 
-number_samples = pd.DataFrame(columns = columns, index = states)
+columns_order = [1,6,0,3,4,5,7,2]
+columns_ordered = [columns[i] for i in columns_order]
+number_samples = pd.DataFrame(columns = columns_ordered, index = states)
+
 for df in all_dfs:
     count = df.State.value_counts().to_dict()
     col = df.columns[1]
@@ -722,14 +725,16 @@ def util_col_name(col):
     if col == 'onset-to-ICU-admission':
         return 'Onset-to-ICU-admission';
     if col == 'onset-to-diagnosis-pcr':
-        return 'Onset-to-PCR-diagnosis'
+        return 'Onset-to-diagnosis (PCR)'
     if col == 'onset-to-diagnosis':
-        return 'Onset-to-non-PCR-diagnosis'
+        return 'Onset-to-diagnosis (non-PCR)'
+    if col == 'onset-to-death':
+        return 'Onset-to-death'
     return col.capitalize()
     
 ##############################################################################
 # plots
-def plot_model_fit_all_models(col_id, xmax=None, ylab = '', right_ylab=''):
+def plot_model_fit_all_models(col_id, xmax=None, ylab = '', right_ylab='', x_lab=''):
     col = columns[col_id]
     alpha_plot = 1
     if xmax:
@@ -776,7 +781,9 @@ def plot_model_fit_all_models(col_id, xmax=None, ylab = '', right_ylab=''):
     plt.plot(x, y, label = 'generalised gamma', color = 'magenta', alpha = alpha_plot)
     
     plt.xlim([0, max_value])
-    plt.xlabel(util_col_name(col))
+    # plt.xlabel(util_col_name(col))
+    plt.xlabel('Days')
+    plt.title(util_col_name(col))
     plt.ylabel(ylab)
     plt.ylim([0,0.125])
     # plt.grid(None)  # this will make the grid for the primary y-axis disappear
@@ -800,7 +807,7 @@ def plot_model_fit_all_models(col_id, xmax=None, ylab = '', right_ylab=''):
     plt.plot(x, y, label = 'gamma', color = 'black', alpha = 0.7, ls = '--')
     
     if right_ylab:
-        plt.ylabel('cumulative')
+        plt.ylabel('Cumulative')
     
     plt.grid(None) # this will make the grid for the secondary y-axis disappear
     plt.ylim([0,1.05])
@@ -820,25 +827,27 @@ def plot_legend():
 xmax=40
 plt.figure(figsize=(10,10))
 plt.subplot(3,3,1)
-plot_model_fit_all_models(0, xmax=xmax, ylab='probability') # ICU-stay
+plot_model_fit_all_models(1, xmax=xmax, ylab='Probability') 
 plt.subplot(3,3,2)
-plot_model_fit_all_models(1, xmax=xmax) # onset-to-death
+plot_model_fit_all_models(6, xmax=xmax)
 plt.subplot(3,3,3)
-plot_model_fit_all_models(2, xmax=xmax, right_ylab=True) # onset-to-diagnosis-non-pcr
+plot_model_fit_all_models(0, xmax=xmax, right_ylab=True) 
 plt.subplot(3,3,4)
-plot_model_fit_all_models(7, xmax=xmax, ylab='probability') # onset-to-diagnosis-pcr
+plot_model_fit_all_models(3, xmax=xmax, ylab='Probability')
 plt.subplot(3,3,5)
-plot_model_fit_all_models(3, xmax=xmax) # onset-to-hospital-admission
+plot_model_fit_all_models(4, xmax=xmax)
 plt.subplot(3,3,6)
-plot_model_fit_all_models(4, xmax=xmax, right_ylab=True) # onset-to-hospital-discharge
+plot_model_fit_all_models(5, xmax=xmax, right_ylab=True, x_lab='days')
 plt.subplot(3,3,7)
-plot_model_fit_all_models(5, xmax=xmax, ylab= 'probability') # onset-to-ICU-admission
+plot_model_fit_all_models(7, xmax=xmax, ylab= 'Probability', x_lab='days')
 plt.subplot(3,3,8)
-plot_model_fit_all_models(6, xmax=xmax, ylab= '', right_ylab=True) # admission-death
+plot_model_fit_all_models(2, xmax=xmax, ylab= '', right_ylab=True, x_lab='days')
 plt.subplot(3,3,9)
 plot_legend()
 plt.tight_layout()
 plt.savefig(OUT_PATH + 'modelFitsAll.pdf', format='pdf')
+
+
 
 
 
@@ -940,14 +949,13 @@ plt.subplot(gs[i+1])
 mean, var = get_means_and_vars_gamma(state, col)
 sns.kdeplot(mean)
 # plt.title(name_map[state])#,fontsize = 22)
-plt.xlabel('mean')
+plt.xlabel('Mean (days)')
 plt.xlim([12,17])
 # plt.subplot(6, 3, i+3)
 plt.subplot(gs[i+2])
 sns.kdeplot(var)
-plt.xlabel('variance')
+plt.xlabel('Variance (days$^2$)')
 plt.xlim([50,140])
-
 plt.tight_layout()
 
 plt.savefig(OUT_PATH + 'onsetToDeathMeanVar.pdf', format='pdf')
@@ -996,10 +1004,12 @@ plt.subplot(1,2,2)
 plot_means_boxplots(states, 'ICU-stay', 'b')
 plt.tight_layout
 
+columns_order = [1,6,0,3,4,5,7,2]
+
 plt.figure(figsize=(12,15)) # do not change that ortherwise annotations will break
-for i in range(len(columns)):
+for i in range(len(columns_order)):
     plt.subplot(8,1,i+1)
-    plot_means_boxplots(states_geo_order, columns[i])
+    plot_means_boxplots(states_geo_order, columns[columns_order[i]])
     plt.axvline(x=6.5, ls = '--', c= 'k')
     plt.axvline(x=15.5, ls = '--', c= 'k')
     plt.axvline(x=19.5, ls = '--', c= 'k')
@@ -1013,4 +1023,5 @@ for i in range(len(columns)):
         plt.annotate('South', xy=(770, y), xycoords='figure pixels', fontsize=14)
 plt.tight_layout()
 plt.savefig(OUT_PATH + 'boxPlotsMeansLocationAllStates.pdf', format='pdf')
+
 
