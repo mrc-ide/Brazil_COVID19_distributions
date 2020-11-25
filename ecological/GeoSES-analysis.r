@@ -1,5 +1,5 @@
-df = fread("~/Downloads/meansForRegression.csv")
-df.var = fread("~/Downloads/varForRegression.csv")
+df = fread("meansForRegression.csv")
+df.var = fread("varForRegression.csv")
 df.scaled = scale(df[,2:23])
 df.scaled = as.data.frame(df.scaled)
 covars = read_excel("~/Downloads/journal.pone.0232074.s003.xls")
